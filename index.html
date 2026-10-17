@@ -106,6 +106,7 @@
     <symbol id="i-arrow-left" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6"/></symbol>
     <symbol id="i-arrow-right" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6"/></symbol>
     <symbol id="i-arrow-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M6 13l6 6 6-6"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
     <symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.2 4.2L19 7"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
@@ -171,6 +172,7 @@
       </div>
     </div>
   </header>
+
   <div class="menu-backdrop" data-menu-backdrop hidden></div>
 
   <main id="main">
@@ -191,7 +193,7 @@
             Jaadu Diet gives you a daily target score and shows how each breakfast, lunch, dinner and snack moves you towards it, with your steps, BMI and history in the same app.
           </p>
 
-          <div class="store-row reveal" style="--d:240ms">
+          <div class="store-row show-mobile-only reveal" style="--d:240ms">
             <a class="store store--play" href="https://play.google.com/store/search?q=jaadu%20diet&amp;c=apps"
                data-track="download" data-store="play" data-location="hero">
               <svg class="store__icon" aria-hidden="true"><use href="#i-play"/></svg>
@@ -204,41 +206,62 @@
             </a>
           </div>
 
-          <ul class="hero__points reveal" style="--d:320ms" role="list">
+          <ul class="hero__points" style="--d:320ms" role="list">
             <li><svg aria-hidden="true"><use href="#i-check"/></svg>Meal-by-meal scores</li>
             <li><svg aria-hidden="true"><use href="#i-check"/></svg>Built-in step counter</li>
             <li><svg aria-hidden="true"><use href="#i-check"/></svg>Consult a dietitian</li>
           </ul>
 
-          <a class="hero__scroll reveal" style="--d:400ms" href="#tour">
+          <a class="hero__scroll" style="--d:400ms" href="#tour">
             <svg aria-hidden="true"><use href="#i-arrow-down"/></svg>
             Take the app tour
           </a>
         </div>
 
         <div class="hero__visual" aria-label="Jaadu Diet home screen with daily scores and step counter" role="img">
-          <svg class="hero__heart" viewBox="0 0 400 360" aria-hidden="true">
-            <path class="hero__heart-red" pathLength="1" d="M196 338C120 282 22 214 28 118 33 44 120 8 182 58c10 8 18 18 24 28"/>
-            <path class="hero__heart-blue" pathLength="1" d="M150 60c48-40 120-52 176-18 50 32 56 104 22 160-34 56-96 100-140 132"/>
+          <!-- Heart in the logo's red/blue ribbons behind the phone; its lobes peek above the phone -->
+          <svg class="hero__heart hero__heart--back" viewBox="0 0 400 356" aria-hidden="true">
+            <defs>
+              <linearGradient id="heart-fill-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" style="stop-color: var(--c-heart-red); stop-opacity: .14"/>
+                <stop offset="1" style="stop-color: var(--c-heart-blue); stop-opacity: .14"/>
+              </linearGradient>
+            </defs>
+            <path class="hero__heart-fill" d="M200 352C150 312 34 236 30 140 27 78 70 34 126 34c36 0 62 22 74 54 12-32 38-54 74-54 56 0 99 44 96 106-4 96-120 172-170 212Z"/>
+            <path class="hero__heart-red" pathLength="1" d="M208 350C150 310 34 236 30 140 27 78 70 34 126 34c36 0 62 22 78 56"/>
+            <path class="hero__heart-blue" pathLength="1" d="M194 92c18-36 44-58 80-58 56 0 99 44 96 106-4 96-120 170-178 210"/>
           </svg>
-
           <div class="phone phone--hero reveal reveal--zoom" style="--d:120ms">
             <div class="phone__screen">
               <img src="assets/img/screen-home.webp" width="576" height="1280" alt="" fetchpriority="high" decoding="async">
             </div>
           </div>
 
-          <div class="float-card float-card--target float" style="--float-delay:-1s">
+
+          <!-- Score cards: real foods and values from the app screenshots -->
+          <div class="float-card float-card--target float" style="--pop:500ms; --float-delay:-1s">
             <span class="float-card__label">Today Target Score</span>
             <strong class="float-card__value tabular" data-countup="5000">5000</strong>
           </div>
-          <div class="float-card float-card--food float-card--plus float" style="--float-delay:-3s">
+          <div class="float-card float-card--oats float-card--extra float" style="--pop:650ms; --float-delay:-2.2s">
+            <img src="assets/img/food-oats.webp" width="56" height="56" alt="" loading="lazy">
+            <span><span class="float-card__name">Oats Milk</span><strong class="text-positive">+500</strong></span>
+          </div>
+          <div class="float-card float-card--curd float-card--extra float" style="--pop:800ms; --float-delay:-5.2s">
+            <img src="assets/img/food-curd.webp" width="56" height="56" alt="" loading="lazy">
+            <span><span class="float-card__name">Low Fat Curd</span><strong class="text-positive">+100</strong></span>
+          </div>
+          <div class="float-card float-card--plus float" style="--pop:950ms; --float-delay:-3s">
             <img src="assets/img/food-raita.webp" width="56" height="56" alt="" loading="lazy">
             <span><span class="float-card__name">Raita</span><strong class="text-positive">+500</strong></span>
           </div>
-          <div class="float-card float-card--food float-card--minus float" style="--float-delay:-4.5s">
+          <div class="float-card float-card--minus float" style="--pop:1100ms; --float-delay:-4.5s">
             <img src="assets/img/food-pulao.webp" width="56" height="56" alt="" loading="lazy">
             <span><span class="float-card__name">Vegetable Pulao</span><strong class="text-negative">−500</strong></span>
+          </div>
+          <div class="float-card float-card--breakfast float" style="--pop:1250ms; --float-delay:-1.6s">
+            <img src="assets/img/icon-breakfast.webp" width="56" height="56" alt="" loading="lazy">
+            <span><span class="float-card__name">Breakfast total</span><strong class="text-negative">−600</strong></span>
           </div>
         </div>
       </div>
@@ -644,8 +667,18 @@
       </nav>
       <p class="site-footer__legal">
         Jaadu Diet is a lifestyle tracking app and does not provide medical diagnosis or treatment. Consult a qualified professional for medical advice. Google Play is a trademark of Google LLC. App Store is a service mark of Apple Inc.
-        <br>© <span data-year>2026</span> Jaadu Diet. All rights reserved.
       </p>
+      <div class="site-footer__bottom">
+        <div class="site-footer__credit">
+          <p class="site-footer__crafted">
+            Crafted with
+            <svg class="site-footer__heart" role="img" aria-label="love"><use href="#i-heart"/></svg>
+            by <strong>SAAOL Infotech</strong>
+          </p>
+          <p class="site-footer__publisher">Jaadu Diet is published by SAAOL Infotech.</p>
+        </div>
+        <p class="site-footer__copy">© <span data-year>2026</span> Jaadu Diet. All rights reserved.</p>
+      </div>
     </div>
   </footer>
 

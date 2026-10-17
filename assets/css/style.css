@@ -60,10 +60,19 @@
 [data-platform="ios"] .store--apple { order: -1; }
 
 /* ---------- Header ---------- */
+/* Fixed (out of flow) so the size change never shifts the page.
+   At the very top it is taller with a bigger logo; .is-scrolled
+   (added by main.js) shrinks it back to --header-h. */
+:root { --header-h-top: 84px; --logo-top: 54px; --brand-top: 1.25rem; }
 .site-header {
-  position: sticky; top: 0; z-index: 50; height: var(--header-h);
-  transition: background-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50; height: var(--header-h);
+  transition: height 450ms var(--ease-out), background-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
 }
+.site-header:not(.is-scrolled) { height: var(--header-h-top); }
+.site-header .brand__logo { transition: width 450ms var(--ease-out), height 450ms var(--ease-out), box-shadow var(--dur); }
+.site-header .brand__name { transition: font-size 450ms var(--ease-out); }
+.site-header:not(.is-scrolled) .brand__logo { width: var(--logo-top); height: var(--logo-top); box-shadow: var(--shadow-md); }
+.site-header:not(.is-scrolled) .brand__name { font-size: var(--brand-top); }
 .site-header.is-scrolled {
   background: color-mix(in srgb, var(--c-bg) 86%, transparent);
   -webkit-backdrop-filter: saturate(160%) blur(14px);
@@ -174,10 +183,10 @@
    ===================================================================== */
 .hero {
   position: relative; isolation: isolate;
-  margin-top: calc(var(--header-h) * -1);
-  padding-top: calc(var(--header-h) + clamp(1.5rem, 4vw, 3.5rem));
+  padding-top: calc(var(--header-h-top) + clamp(1rem, 3vw, 2.5rem));
   padding-bottom: clamp(3rem, 6vw, 5.5rem);
   overflow: hidden;
+  padding-top: 90px;
 }
 .hero__bg { position: absolute; inset: 0; z-index: -1; background: var(--grad-hero); }
 .hero__bg::before { /* brand doodle pattern from the app's splash screen */
@@ -221,35 +230,57 @@
 @keyframes nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
 
 /* Hero visual */
-.hero__visual { position: relative; display: grid; place-items: center; padding-block: var(--sp-4); }
-.hero__visual .phone { --phone-w: clamp(220px, 62vw, 330px); z-index: 1; }
-.hero__heart {
-  position: absolute; z-index: 0; left: 50%; top: 50%;
-  width: min(118%, 560px); transform: translate(-50%, -46%);
-  fill: none; stroke-width: 11; stroke-linecap: round; overflow: visible;
+.hero__visual {
+  --phone-w: clamp(210px, 56vw, 300px);
+  /* heart width follows the phone, but never wider than the screen */
+  --heart-w: min(calc(var(--phone-w) * 1.85), calc(100vw - 16px));
+  position: relative; display: grid; place-items: center;
+  padding-top: calc(var(--heart-w) * 0.15); padding-bottom: var(--sp-6);
 }
-.hero__heart path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.8s var(--ease-out) 300ms forwards; }
+.hero__visual .phone { --phone-w: inherit; z-index: 1; }
+/* Heart sits behind the phone; its lobes rise just above the phone's top edge */
+.hero__heart {
+  position: absolute; z-index: 0; left: 50%; top: 0;
+  width: var(--heart-w); transform: translateX(-50%); transform-origin: 50% 40%;
+  fill: none; stroke-width: 11; stroke-linecap: round; overflow: visible; pointer-events: none;
+  animation: heartbeat 4.8s var(--ease-in-out) 2.8s infinite;
+}
+.hero__heart path:not(.hero__heart-fill) { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.8s var(--ease-out) 300ms forwards; }
 .hero__heart-red { stroke: var(--c-heart-red); }
 .hero__heart-blue { stroke: var(--c-heart-blue); animation-delay: 650ms !important; }
+.hero__heart-fill { fill: url(#heart-fill-grad); stroke: none; opacity: 0; animation: heart-fill 1.2s var(--ease-out) 1.2s forwards; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes heart-fill { to { opacity: 1; } }
+@keyframes heartbeat {
+  0%, 40%, 100% { transform: translateX(-50%) scale(1); }
+  8% { transform: translateX(-50%) scale(1.03); }
+  16% { transform: translateX(-50%) scale(1); }
+  24% { transform: translateX(-50%) scale(1.02); }
+}
 
 .float-card {
-  position: absolute; z-index: 2;
+  position: absolute; z-index: 3;
   display: flex; align-items: center; gap: 10px;
   padding: 10px 14px; border-radius: var(--r-md);
   background: color-mix(in srgb, var(--c-surface) 94%, transparent);
   border: 1px solid var(--c-line);
   box-shadow: var(--shadow-md);
   font-size: var(--fs-xs); line-height: 1.25;
+  /* pop in one after another (scale/opacity), then gently bob (transform) */
+  animation: card-pop 700ms var(--ease-out) var(--pop, 500ms) both, float 6s var(--ease-in-out) var(--float-delay, 0s) infinite;
 }
+@keyframes card-pop { from { opacity: 0; scale: 0.7; } to { opacity: 1; scale: 1; } }
 .float-card img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }
 .float-card strong { font-size: 1.05rem; display: block; }
 .float-card__name { display: block; color: var(--c-ink-2); font-weight: 500; }
-.float-card--target { flex-direction: column; align-items: stretch; gap: 0; padding: 0; overflow: hidden; text-align: center; top: 12%; left: 0; min-width: 132px; }
+.float-card--target { flex-direction: column; align-items: stretch; gap: 0; padding: 0; overflow: hidden; text-align: center; top: 9%; left: 0; min-width: 132px; }
 .float-card--target .float-card__value { order: -1; padding: 8px 14px 6px; font-size: 1.45rem; color: var(--c-ink); }
 .float-card--target .float-card__label { padding: 6px 12px; background: var(--grad-brand); color: var(--c-on-brand); font-weight: 600; font-size: 0.72rem; }
-.float-card--plus { top: 48%; right: 0; }
-.float-card--minus { bottom: 9%; left: 2%; }
+.float-card--oats { top: 16%; right: 0; }
+.float-card--curd { top: 40%; left: 0; }
+.float-card--plus { top: 50%; right: 0; }
+.float-card--minus { bottom: 13%; left: 0; }
+.float-card--breakfast { bottom: 3%; right: 0; }
 
 /* =====================================================================
    TICKER
@@ -302,7 +333,7 @@
 .demo__reset:disabled { opacity: 0.4; cursor: default; }
 .demo__score { margin-top: var(--sp-5); padding: var(--sp-5); border-radius: var(--r-lg); background: var(--c-surface-2); border: 1px solid var(--c-line); }
 .demo__score-row { display: flex; justify-content: space-between; gap: var(--sp-3); font-size: var(--fs-xs); color: var(--c-muted); font-weight: 500; }
-.demo__score-target strong { color: var(--c-ink); }
+.demo__score-target strong { font-size: 22px; color: var(--c-ink); }
 .demo__score-value {
   display: block; margin-top: 2px; font-size: clamp(2.6rem, 2rem + 2.4vw, 3.6rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em;
   color: var(--c-ink); transition: color var(--dur);
@@ -622,6 +653,21 @@ html:not(.js) .carousel__controls { display: none; }
 .site-footer__links a { color: var(--c-on-deep); text-decoration: none; font-size: var(--fs-sm); opacity: 0.85; }
 .site-footer__links a:hover { opacity: 1; text-decoration: underline; }
 .site-footer__legal { grid-column: 1 / -1; padding-top: var(--sp-5); border-top: 1px solid color-mix(in srgb, var(--c-on-deep) 14%, transparent); font-size: 0.75rem; color: var(--c-on-deep-muted); line-height: 1.7; }
+.site-footer__bottom {
+  grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--sp-4) var(--sp-5);
+  margin-top: calc(var(--sp-2) * -1); font-size: 0.75rem; color: var(--c-on-deep-muted); line-height: 1.7;
+}
+.site-footer__crafted {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em;
+  font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.3rem); font-weight: 500; color: var(--c-on-deep); line-height: 1.4;
+}
+.site-footer__crafted strong {
+  font-weight: 700; letter-spacing: 0.01em;
+  background: linear-gradient(90deg, var(--c-brand-2), #ffffff); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.site-footer__heart { width: 1.05em; height: 1.05em; color: var(--c-heart-red); animation: footer-beat 1.6s ease-in-out infinite; }
+@keyframes footer-beat { 0%, 60%, 100% { transform: scale(1); } 15% { transform: scale(1.22); } 30% { transform: scale(1); } 45% { transform: scale(1.12); } }
+.site-footer__publisher { margin-top: 4px; font-size: 0.8125rem; }
 
 /* =====================================================================
    STICKY MOBILE CTA
@@ -647,6 +693,9 @@ html:not(.js) .carousel__controls { display: none; }
    RESPONSIVE
    ===================================================================== */
 @media (max-width: 479.98px) {
+  :root { --header-h-top: 78px; --logo-top: 50px; --brand-top: 1.12rem; }
+  .float-card--extra { display: none; }
+  .float-card--breakfast { bottom: 3%; }
   .site-header__inner { gap: var(--sp-2); }
   .brand { gap: 8px; }
   .brand__logo { width: 38px; height: 38px; }
@@ -657,7 +706,7 @@ html:not(.js) .carousel__controls { display: none; }
   .float-card { padding: 7px 10px; gap: 8px; }
   .float-card img { width: 34px; height: 34px; border-radius: 8px; }
   .float-card strong { font-size: 0.95rem; }
-  .float-card--target { min-width: 100px; top: 8%; }
+  .float-card--target { min-width: 100px; top: 4%; }
   .float-card--target .float-card__value { font-size: 1.15rem; padding: 6px 10px 4px; }
   .float-card--target .float-card__label { font-size: 0.62rem; padding: 5px 8px; }
   .store { padding: 9px 12px; gap: 8px; }
@@ -666,6 +715,7 @@ html:not(.js) .carousel__controls { display: none; }
   .store__text strong { font-size: 1rem; }
 }
 @media (max-width: 380px) {
+  :root { --logo-top: 46px; --brand-top: 1.02rem; }
   .brand__name { font-size: 0.95rem; }
   .site-header .btn--sm { padding: 0 0.8rem; font-size: 0.8125rem; }
   .store { padding-inline: 12px 14px; }
@@ -682,12 +732,15 @@ html:not(.js) .carousel__controls { display: none; }
 }
 
 @media (min-width: 960px) {
-  :root { --header-h: 76px; }
+  :root { --header-h: 76px; --header-h-top: 100px; --logo-top: 68px; --brand-top: 1.45rem; }
   .hero__grid { grid-template-columns: 1.08fr 0.92fr; }
-  .hero__visual .phone { --phone-w: clamp(270px, 25vw, 330px); }
+  .hero__visual { --phone-w: clamp(260px, 21vw, 320px); }
   .float-card--target { left: -2%; }
-  .float-card--plus { right: -4%; }
-  .float-card--minus { left: -6%; }
+  .float-card--oats { right: -2%; }
+  .float-card--curd { left: -4%; }
+  .float-card--plus { right: -6%; }
+  .float-card--minus { left: -4%; }
+  .float-card--breakfast { right: -2%; }
 
   .how__grid { grid-template-columns: 1fr 1fr; }
   .demo { position: sticky; top: calc(var(--header-h) + 24px); }
@@ -728,7 +781,11 @@ html:not(.js) .carousel__controls { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .ticker__track { animation: none; }
   .hero__heart path { stroke-dashoffset: 0; }
+  .hero__heart { animation: none; }
+  .hero__heart-fill { opacity: 1; }
+  .float-card { animation: none; }
   .hero__title-accent .accent-serif::after { transform: none; }
   .float { animation: none; }
   .qr__scan { display: none; }
 }
+

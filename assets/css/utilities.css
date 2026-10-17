@@ -355,6 +355,10 @@ ul[role="list"], ol[role="list"] { list-style: none; padding: 0; }
 .js .reveal--right { transform: translate3d(32px, 0, 0); }
 .js .reveal--zoom { transform: scale(0.94); }
 .js .reveal.is-in { opacity: 1; transform: none; }
+/* Below desktop, sideways reveals slide up instead (a sideways offset would widen the page on phones) */
+@media (max-width: 959.98px) {
+  .js .reveal--left:not(.is-in), .js .reveal--right:not(.is-in) { transform: translate3d(0, 28px, 0); }
+}
 
 .float { animation: float 6s var(--ease-in-out) infinite; animation-delay: var(--float-delay, 0s); }
 @keyframes float {
